@@ -1,4 +1,3 @@
-
 /**
  * Entry point for the Drug Interaction Detection System React frontend
  * 
@@ -334,4 +333,152 @@ const initializeApp = () => {
       border: 4px solid #f3f3f3;
       border-top: 4px solid #007bff;
       border-radius: 50%;
-      width:
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive design helpers */
+    @media (max-width: 768px) {
+      .notification-container {
+        left: 10px;
+        right: 10px;
+        top: 10px;
+        max-width: none;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Set up global error handling
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    // Prevent the default browser error handling
+    event.preventDefault();
+  });
+
+  window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+  });
+
+  // Initialize the React app
+  renderApp();
+  
+  // Register service worker for PWA functionality
+  registerServiceWorker();
+  
+  // Report web vitals for performance monitoring
+  if (typeof reportWebVitals === 'function') {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(reportWebVitals);
+      getFID(reportWebVitals);
+      getFCP(reportWebVitals);
+      getLCP(reportWebVitals);
+      getTTFB(reportWebVitals);
+    }).catch(() => {
+      // web-vitals not available, continue without it
+    });
+  }
+};
+
+// Application loading indicator
+const showLoadingIndicator = () => {
+  const loadingDiv = document.createElement('div');
+  loadingDiv.id = 'initial-loading';
+  loadingDiv.innerHTML = `
+    <div style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    ">
+      <div style="text-align: center;">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 20px; color: #666; font-family: Arial, sans-serif;">
+          Loading Drug Interaction Detection System...
+        </p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(loadingDiv);
+  
+  // Remove loading indicator after app loads
+  setTimeout(() => {
+    const loading = document.getElementById('initial-loading');
+    if (loading) {
+      loading.remove();
+    }
+  }, 2000);
+};
+
+// Environment-specific configurations
+const setupEnvironment = () => {
+  if (process.env.NODE_ENV === 'development') {
+    // Development-specific setup
+    console.log('🚀 Drug Interaction Detection System - Development Mode');
+    
+    // Enable React DevTools integration
+    if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+      console.log('React DevTools detected');
+    }
+  } else {
+    // Production-specific setup
+    console.log('%c🏥 Drug Interaction Detection System', 'color: #007bff; font-weight: bold; font-size: 16px;');
+    
+    // Disable console logs in production
+    if (process.env.NODE_ENV === 'production') {
+      console.log = () => {};
+      console.warn = () => {};
+    }
+  }
+};
+
+// Check browser compatibility
+const checkBrowserCompatibility = () => {
+  const requiredFeatures = [
+    'fetch',
+    'Promise',
+    'localStorage',
+    'FileReader',
+    'FormData'
+  ];
+  
+  const unsupportedFeatures = requiredFeatures.filter(feature => !(feature in window));
+  
+  if (unsupportedFeatures.length > 0) {
+    const message = `Your browser doesn't support required features: ${unsupportedFeatures.join(', ')}. Please update your browser for the best experience.`;
+    alert(message);
+    console.error('Browser compatibility check failed:', unsupportedFeatures);
+  }
+};
+
+// Initialize everything when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setupEnvironment();
+    checkBrowserCompatibility();
+    showLoadingIndicator();
+    initializeApp();
+  });
+} else {
+  // DOM already loaded
+  setupEnvironment();
+  checkBrowserCompatibility();
+  showLoadingIndicator();
+  initializeApp();
+}
+
+// Export contexts for use in other components
+export { AuthContext, NotificationContext };
