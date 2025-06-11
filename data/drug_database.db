@@ -1,1 +1,329 @@
 
+-- Drug Interaction Detection System Database Schema
+-- This SQL script creates the necessary tables and populates them with sample data
+-- for the drug interaction detection system.
+
+-- Enable foreign key constraints
+PRAGMA foreign_keys = ON;
+
+-- Create Users table for authentication and user management
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,  -- Hashed password using bcrypt
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    is_active BOOLEAN DEFAULT TRUE,
+    is_admin BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP,
+    phone_number VARCHAR(20),
+    date_of_birth DATE,
+    medical_license VARCHAR(50)  -- For healthcare professionals
+);
+
+-- Create index for faster user lookups
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
+-- Create Drug Information table
+CREATE TABLE IF NOT EXISTS drugs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(200) NOT NULL,
+    generic_name VARCHAR(200),
+    brand_names TEXT,  -- JSON array of brand names
+    drug_class VARCHAR(100),
+    active_ingredients TEXT,  -- JSON array of active ingredients
+    description TEXT,
+    dosage_forms TEXT,  -- JSON array of available forms (tablet, capsule, etc.)
+    strength_options TEXT,  -- JSON array of available strengths
+    therapeutic_class VARCHAR(100),
+    controlled_substance_schedule VARCHAR(10),
+    fda_approval_date DATE,
+    manufacturer VARCHAR(200),
+    ndc_codes TEXT,  -- JSON array of NDC codes
+    rxcui VARCHAR(20),  -- RxNorm Concept Unique Identifier
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for drug searches
+CREATE INDEX IF NOT EXISTS idx_drugs_name ON drugs(name);
+CREATE INDEX IF NOT EXISTS idx_drugs_generic_name ON drugs(generic_name);
+CREATE INDEX IF NOT EXISTS idx_drugs_rxcui ON drugs(rxcui);
+
+-- Create Drug Interactions table
+CREATE TABLE IF NOT EXISTS drug_interactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    drug_name VARCHAR(200) NOT NULL,
+    interacting_drug VARCHAR(200) NOT NULL,
+    severity VARCHAR(20) NOT NULL CHECK (severity IN ('CRITICAL', 'MAJOR', 'MODERATE', 'MINOR')),
+    interaction_type VARCHAR(50),  -- pharmacokinetic, pharmacodynamic, etc.
+    mechanism TEXT,  -- How the interaction occurs
+    clinical_effect TEXT,  -- What happens clinically
+    description TEXT NOT NULL,
+    management TEXT,  -- How to manage the interaction
+    evidence_level VARCHAR(20) DEFAULT 'ESTABLISHED',  -- ESTABLISHED, PROBABLE, THEORETICAL
+    onset VARCHAR(20),  -- RAPID, DELAYED
+    documentation VARCHAR(20),  -- EXCELLENT, GOOD, FAIR, POOR
+    probability VARCHAR(20),  -- HIGH, MODERATE, LOW
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    source VARCHAR(100),  -- Data source reference
+    source_url TEXT
+);
+
+-- Create indexes for interaction lookups
+CREATE INDEX IF NOT EXISTS idx_interactions_drug1 ON drug_interactions(drug_name);
+CREATE INDEX IF NOT EXISTS idx_interactions_drug2 ON drug_interactions(interacting_drug);
+CREATE INDEX IF NOT EXISTS idx_interactions_severity ON drug_interactions(severity);
+
+-- Create Scan History table to track user interactions
+CREATE TABLE IF NOT EXISTS scan_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    image_path VARCHAR(500),
+    extracted_text TEXT,
+    drug_names TEXT,  -- Comma-separated list of detected drugs
+    interaction_count INTEGER DEFAULT 0,
+    severity_level VARCHAR(20),
+    processing_time_ms INTEGER,  -- Time taken to process the image
+    confidence_score REAL,  -- OCR confidence score
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- Create index for scan history lookups
+CREATE INDEX IF NOT EXISTS idx_scan_history_user ON scan_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_scan_history_date ON scan_history(created_at);
+
+-- Create User Medications table for tracking user's current medications
+CREATE TABLE IF NOT EXISTS user_medications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    drug_name VARCHAR(200) NOT NULL,
+    dosage VARCHAR(50),
+    frequency VARCHAR(100),
+    start_date DATE,
+    end_date DATE,
+    prescribing_doctor VARCHAR(200),
+    notes TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- Create index for user medications
+CREATE INDEX IF NOT EXISTS idx_user_medications_user ON user_medications(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_medications_active ON user_medications(is_active);
+
+-- Create Alerts table for interaction warnings
+CREATE TABLE IF NOT EXISTS alerts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    alert_type VARCHAR(50) NOT NULL,  -- INTERACTION, ALLERGY, DOSAGE, etc.
+    severity VARCHAR(20) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    drugs_involved TEXT,  -- JSON array of drugs involved
+    is_read BOOLEAN DEFAULT FALSE,
+    is_dismissed BOOLEAN DEFAULT FALSE,
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- Create index for alerts
+CREATE INDEX IF NOT EXISTS idx_alerts_user ON alerts(user_id);
+CREATE INDEX IF NOT EXISTS idx_alerts_unread ON alerts(user_id, is_read);
+
+-- Insert sample data for testing
+
+-- Sample users (passwords should be hashed in production)
+INSERT OR IGNORE INTO users (username, email, password_hash, first_name, last_name, is_admin) VALUES
+('admin', 'admin@druginteraction.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LQdHxkd0LHAkCOYz6T', 'Admin', 'User', TRUE),
+('doctor1', 'doctor@hospital.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LQdHxkd0LHAkCOYz6T', 'Dr. Jane', 'Smith', FALSE),
+('patient1', 'patient@email.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LQdHxkd0LHAkCOYz6T', 'John', 'Doe', FALSE);
+
+-- Sample drug data
+INSERT OR IGNORE INTO drugs (name, generic_name, drug_class, description, therapeutic_class) VALUES
+('Warfarin', 'warfarin sodium', 'Anticoagulant', 'Blood thinner used to prevent blood clots', 'Cardiovascular'),
+('Aspirin', 'acetylsalicylic acid', 'NSAID', 'Pain reliever and anti-inflammatory', 'Analgesic'),
+('Ibuprofen', 'ibuprofen', 'NSAID', 'Nonsteroidal anti-inflammatory drug', 'Analgesic'),
+('Lisinopril', 'lisinopril', 'ACE Inhibitor', 'Used to treat high blood pressure', 'Cardiovascular'),
+('Metformin', 'metformin hydrochloride', 'Antidiabetic', 'Used to treat type 2 diabetes', 'Endocrine'),
+('Simvastatin', 'simvastatin', 'Statin', 'Cholesterol-lowering medication', 'Cardiovascular'),
+('Omeprazole', 'omeprazole', 'PPI', 'Proton pump inhibitor for acid reflux', 'Gastrointestinal'),
+('Digoxin', 'digoxin', 'Cardiac Glycoside', 'Heart medication for heart failure', 'Cardiovascular'),
+('Amoxicillin', 'amoxicillin', 'Antibiotic', 'Penicillin antibiotic', 'Anti-infective'),
+('Phenytoin', 'phenytoin sodium', 'Anticonvulsant', 'Anti-seizure medication', 'Neurological');
+
+-- Sample drug interactions with varying severity levels
+INSERT OR IGNORE INTO drug_interactions (drug_name, interacting_drug, severity, interaction_type, description, management, evidence_level) VALUES
+-- Critical interactions
+('Warfarin', 'Aspirin', 'CRITICAL', 'Pharmacodynamic', 'Increased risk of bleeding due to additive anticoagulant effects', 'Avoid combination or monitor INR closely. Consider alternative pain management.', 'ESTABLISHED'),
+('Warfarin', 'Ibuprofen', 'CRITICAL', 'Pharmacodynamic', 'Significantly increased bleeding risk', 'Avoid NSAIDs with warfarin. Use acetaminophen for pain relief.', 'ESTABLISHED'),
+('Digoxin', 'Omeprazole', 'MAJOR', 'Pharmacokinetic', 'Omeprazole may increase digoxin levels', 'Monitor digoxin levels closely when starting omeprazole', 'PROBABLE'),
+
+-- Major interactions
+('Simvastatin', 'Omeprazole', 'MAJOR', 'Pharmacokinetic', 'Omeprazole may increase simvastatin levels increasing risk of myopathy', 'Monitor for muscle pain and weakness. Consider lower statin dose.', 'PROBABLE'),
+('Lisinopril', 'Ibuprofen', 'MAJOR', 'Pharmacodynamic', 'NSAIDs may reduce the effectiveness of ACE inhibitors', 'Monitor blood pressure. Consider alternative pain management.', 'ESTABLISHED'),
+('Metformin', 'Ibuprofen', 'MODERATE', 'Pharmacodynamic', 'NSAIDs may affect kidney function and metformin clearance', 'Monitor kidney function and blood sugar levels', 'PROBABLE'),
+
+-- Moderate interactions
+('Phenytoin', 'Omeprazole', 'MODERATE', 'Pharmacokinetic', 'Omeprazole may increase phenytoin levels', 'Monitor phenytoin levels and adjust dose if needed', 'PROBABLE'),
+('Amoxicillin', 'Warfarin', 'MODERATE', 'Pharmacokinetic', 'Antibiotics may potentiate warfarin effect', 'Monitor INR more frequently during antibiotic course', 'PROBABLE'),
+
+-- Minor interactions
+('Aspirin', 'Lisinopril', 'MINOR', 'Pharmacodynamic', 'Low-dose aspirin generally safe with ACE inhibitors', 'Monitor blood pressure periodically', 'ESTABLISHED'),
+('Metformin', 'Simvastatin', 'MINOR', 'None significant', 'Generally safe combination commonly used together', 'No specific monitoring required', 'ESTABLISHED');
+
+-- Sample scan history
+INSERT OR IGNORE INTO scan_history (user_id, extracted_text, drug_names, interaction_count, severity_level) VALUES
+(2, 'WARFARIN SODIUM TABLETS 5mg Take as directed', 'Warfarin', 0, 'NONE'),
+(3, 'IBUPROFEN 200mg ASPIRIN 81mg', 'Ibuprofen,Aspirin', 1, 'MODERATE'),
+(3, 'LISINOPRIL 10mg METFORMIN 500mg', 'Lisinopril,Metformin', 0, 'NONE');
+
+-- Sample user medications
+INSERT OR IGNORE INTO user_medications (user_id, drug_name, dosage, frequency, start_date) VALUES
+(2, 'Lisinopril', '10mg', 'Once daily', '2024-01-15'),
+(2, 'Metformin', '500mg', 'Twice daily', '2024-01-15'),
+(3, 'Warfarin', '5mg', 'Once daily', '2024-02-01'),
+(3, 'Omeprazole', '20mg', 'Once daily', '2024-02-15');
+
+-- Create triggers to automatically update the updated_at timestamp
+CREATE TRIGGER IF NOT EXISTS update_users_timestamp 
+    AFTER UPDATE ON users
+    FOR EACH ROW
+    WHEN NEW.updated_at = OLD.updated_at
+BEGIN
+    UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS update_drugs_timestamp 
+    AFTER UPDATE ON drugs
+    FOR EACH ROW
+    WHEN NEW.updated_at = OLD.updated_at
+BEGIN
+    UPDATE drugs SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS update_interactions_timestamp 
+    AFTER UPDATE ON drug_interactions
+    FOR EACH ROW
+    WHEN NEW.updated_at = OLD.updated_at
+BEGIN
+    UPDATE drug_interactions SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS update_user_medications_timestamp 
+    AFTER UPDATE ON user_medications
+    FOR EACH ROW
+    WHEN NEW.updated_at = OLD.updated_at
+BEGIN
+    UPDATE user_medications SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+END;
+
+-- Create views for common queries
+CREATE VIEW IF NOT EXISTS user_active_medications AS
+SELECT 
+    um.user_id,
+    u.username,
+    u.email,
+    um.drug_name,
+    um.dosage,
+    um.frequency,
+    um.start_date,
+    um.prescribing_doctor
+FROM user_medications um
+JOIN users u ON um.user_id = u.id
+WHERE um.is_active = TRUE AND u.is_active = TRUE;
+
+CREATE VIEW IF NOT EXISTS critical_interactions AS
+SELECT 
+    di.drug_name,
+    di.interacting_drug,
+    di.severity,
+    di.description,
+    di.management,
+    di.evidence_level
+FROM drug_interactions di
+WHERE di.severity = 'CRITICAL'
+ORDER BY di.drug_name, di.interacting_drug;
+
+CREATE VIEW IF NOT EXISTS interaction_summary AS
+SELECT 
+    severity,
+    COUNT(*) as interaction_count,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM drug_interactions), 2) as percentage
+FROM drug_interactions
+GROUP BY severity
+ORDER BY 
+    CASE severity
+        WHEN 'CRITICAL' THEN 1
+        WHEN 'MAJOR' THEN 2
+        WHEN 'MODERATE' THEN 3
+        WHEN 'MINOR' THEN 4
+    END;
+
+-- Insert additional sample data for comprehensive testing
+INSERT OR IGNORE INTO drug_interactions (drug_name, interacting_drug, severity, interaction_type, description, management, evidence_level) VALUES
+-- More comprehensive interaction data
+('Acetaminophen', 'Warfarin', 'MODERATE', 'Pharmacokinetic', 'High doses of acetaminophen may enhance warfarin effect', 'Avoid regular high-dose acetaminophen. Monitor INR if used regularly.', 'PROBABLE'),
+('Ciprofloxacin', 'Warfarin', 'MAJOR', 'Pharmacokinetic', 'Ciprofloxacin significantly increases warfarin effect', 'Monitor INR closely. Consider alternative antibiotic if possible.', 'ESTABLISHED'),
+('Fluconazole', 'Warfarin', 'CRITICAL', 'Pharmacokinetic', 'Fluconazole dramatically increases warfarin levels', 'Reduce warfarin dose by 25-50%. Monitor INR daily initially.', 'ESTABLISHED'),
+('Clopidogrel', 'Aspirin', 'MAJOR', 'Pharmacodynamic', 'Increased bleeding risk with dual antiplatelet therapy', 'Use combination only when clinically indicated. Monitor for bleeding.', 'ESTABLISHED'),
+('Losartan', 'Ibuprofen', 'MODERATE', 'Pharmacodynamic', 'NSAIDs may reduce effectiveness of ARBs', 'Monitor blood pressure and kidney function', 'ESTABLISHED');
+
+-- Create a function to check for potential interactions (using a trigger)
+CREATE TRIGGER IF NOT EXISTS check_new_medication
+    AFTER INSERT ON user_medications
+    FOR EACH ROW
+BEGIN
+    INSERT INTO alerts (user_id, alert_type, severity, title, message, drugs_involved)
+    SELECT 
+        NEW.user_id,
+        'INTERACTION',
+        di.severity,
+        'Potential Drug Interaction Detected',
+        'Interaction detected between ' || NEW.drug_name || ' and ' || um.drug_name || ': ' || di.description,
+        '["' || NEW.drug_name || '", "' || um.drug_name || '"]'
+    FROM user_medications um
+    JOIN drug_interactions di ON 
+        (di.drug_name LIKE '%' || NEW.drug_name || '%' AND di.interacting_drug LIKE '%' || um.drug_name || '%') OR
+        (di.drug_name LIKE '%' || um.drug_name || '%' AND di.interacting_drug LIKE '%' || NEW.drug_name || '%')
+    WHERE um.user_id = NEW.user_id 
+      AND um.is_active = TRUE 
+      AND um.id != NEW.id;
+END;
+
+-- Add some additional useful indexes for performance
+CREATE INDEX IF NOT EXISTS idx_drug_interactions_combined ON drug_interactions(drug_name, interacting_drug);
+CREATE INDEX IF NOT EXISTS idx_alerts_type_severity ON alerts(alert_type, severity);
+CREATE INDEX IF NOT EXISTS idx_scan_history_severity ON scan_history(severity_level);
+
+-- Insert some example alerts
+INSERT OR IGNORE INTO alerts (user_id, alert_type, severity, title, message, drugs_involved) VALUES
+(3, 'INTERACTION', 'CRITICAL', 'Critical Drug Interaction', 'Critical interaction detected between Warfarin and potential new medication', '["Warfarin", "Aspirin"]'),
+(2, 'INTERACTION', 'MODERATE', 'Moderate Drug Interaction', 'Monitor blood pressure when taking these medications together', '["Lisinopril", "Ibuprofen"]');
+
+-- Create a final summary query for database statistics
+CREATE VIEW IF NOT EXISTS database_stats AS
+SELECT 
+    'Users' as table_name, COUNT(*) as record_count FROM users
+UNION ALL
+SELECT 'Drugs', COUNT(*) FROM drugs
+UNION ALL
+SELECT 'Drug Interactions', COUNT(*) FROM drug_interactions
+UNION ALL
+SELECT 'Scan History', COUNT(*) FROM scan_history
+UNION ALL
+SELECT 'User Medications', COUNT(*) FROM user_medications
+UNION ALL
+SELECT 'Alerts', COUNT(*) FROM alerts;
+
+-- Final comment: Database schema is now complete and ready for use
+-- To run this script: sqlite3 drug_database.db < database_setup.sql
