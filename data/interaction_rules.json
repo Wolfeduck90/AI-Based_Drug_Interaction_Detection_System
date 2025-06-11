@@ -1,1 +1,683 @@
-
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2025-06-11",
+    "description": "Comprehensive drug interaction rules database for pharmaceutical safety monitoring",
+    "total_rules": 45,
+    "severity_levels": ["minor", "moderate", "major", "contraindicated"]
+  },
+  "interaction_categories": {
+    "pharmacokinetic": {
+      "description": "Interactions affecting drug absorption, distribution, metabolism, or elimination",
+      "subcategories": ["cyp450_inhibition", "cyp450_induction", "protein_binding", "renal_clearance"]
+    },
+    "pharmacodynamic": {
+      "description": "Interactions affecting drug mechanism of action or therapeutic effect",
+      "subcategories": ["synergistic", "antagonistic", "additive"]
+    },
+    "physicochemical": {
+      "description": "Physical or chemical incompatibilities",
+      "subcategories": ["precipitation", "degradation", "chelation"]
+    }
+  },
+  "severity_definitions": {
+    "minor": {
+      "description": "Interaction is of limited clinical significance",
+      "action": "Monitor therapy",
+      "color_code": "#28a745"
+    },
+    "moderate": {
+      "description": "Clinically significant interaction that may require dose adjustment",
+      "action": "Monitor closely and consider dose modification",
+      "color_code": "#ffc107"
+    },
+    "major": {
+      "description": "Significant interaction that may cause serious adverse effects",
+      "action": "Avoid combination or use alternative therapy",
+      "color_code": "#fd7e14"
+    },
+    "contraindicated": {
+      "description": "Combination should never be used due to high risk of serious harm",
+      "action": "Do not use together - select alternative therapy",
+      "color_code": "#dc3545"
+    }
+  },
+  "interaction_rules": [
+    {
+      "id": "RULE_001",
+      "drug_a": "warfarin",
+      "drug_b": "aspirin",
+      "severity": "major",
+      "category": "pharmacodynamic",
+      "mechanism": "Additive anticoagulant effects increase bleeding risk",
+      "clinical_effects": ["Increased bleeding risk", "Prolonged clotting time", "Gastrointestinal bleeding"],
+      "management": "Avoid combination. If necessary, use lowest effective doses and monitor INR closely.",
+      "evidence_level": "A",
+      "references": ["Holbrook AM, et al. Arch Intern Med. 2005;165(10):1095-1106"]
+    },
+    {
+      "id": "RULE_002",
+      "drug_a": "simvastatin",
+      "drug_b": "clarithromycin",
+      "severity": "contraindicated",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases simvastatin levels leading to rhabdomyolysis risk",
+      "clinical_effects": ["Rhabdomyolysis", "Myopathy", "Acute kidney injury"],
+      "management": "Do not use together. Suspend statin therapy during clarithromycin treatment.",
+      "evidence_level": "A",
+      "references": ["FDA Drug Safety Communication. August 2012"]
+    },
+    {
+      "id": "RULE_003",
+      "drug_a": "digoxin",
+      "drug_b": "furosemide",
+      "severity": "moderate",
+      "category": "pharmacodynamic",
+      "mechanism": "Furosemide-induced electrolyte depletion enhances digoxin toxicity",
+      "clinical_effects": ["Digoxin toxicity", "Cardiac arrhythmias", "Hypokalemia"],
+      "management": "Monitor digoxin levels and electrolytes. Correct hypokalemia promptly.",
+      "evidence_level": "B",
+      "references": ["Bauman JL, et al. Clin Pharmacokinet. 2006;45(2):127-137"]
+    },
+    {
+      "id": "RULE_004",
+      "drug_a": "phenytoin",
+      "drug_b": "carbamazepine",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "Mutual enzyme induction decreases levels of both drugs",
+      "clinical_effects": ["Reduced seizure control", "Subtherapeutic drug levels"],
+      "management": "Monitor drug levels and adjust doses accordingly. Consider alternative anticonvulsants.",
+      "evidence_level": "B",
+      "references": ["Patsalos PN, et al. Epilepsia. 2008;49(7):1239-1276"]
+    },
+    {
+      "id": "RULE_005",
+      "drug_a": "metformin",
+      "drug_b": "iodinated_contrast",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "Risk of contrast-induced nephropathy and lactic acidosis",
+      "clinical_effects": ["Lactic acidosis", "Acute kidney injury", "Metabolic acidosis"],
+      "management": "Discontinue metformin 48 hours before contrast procedure. Resume after confirming normal kidney function.",
+      "evidence_level": "A",
+      "references": ["ACR Manual on Contrast Media. 2021"]
+    },
+    {
+      "id": "RULE_006",
+      "drug_a": "lithium",
+      "drug_b": "lisinopril",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "ACE inhibitors reduce lithium clearance increasing toxicity risk",
+      "clinical_effects": ["Lithium toxicity", "Tremor", "Confusion", "Kidney damage"],
+      "management": "Monitor lithium levels closely. Consider dose reduction or alternative mood stabilizer.",
+      "evidence_level": "A",
+      "references": ["Finley PR, et al. Clin Pharmacokinet. 2016;55(8):925-941"]
+    },
+    {
+      "id": "RULE_007",
+      "drug_a": "tramadol",
+      "drug_b": "sertraline",
+      "severity": "major",
+      "category": "pharmacodynamic",
+      "mechanism": "Increased risk of serotonin syndrome due to additive serotonergic effects",
+      "clinical_effects": ["Serotonin syndrome", "Hyperthermia", "Altered mental status", "Neuromuscular abnormalities"],
+      "management": "Avoid combination. Use alternative analgesic or antidepressant if possible.",
+      "evidence_level": "A",
+      "references": ["Boyer EW, et al. N Engl J Med. 2005;352(11):1112-1120"]
+    },
+    {
+      "id": "RULE_008",
+      "drug_a": "allopurinol",
+      "drug_b": "azathioprine",
+      "severity": "contraindicated",
+      "category": "pharmacokinetic",
+      "mechanism": "Allopurinol inhibits xanthine oxidase, preventing azathioprine metabolism",
+      "clinical_effects": ["Severe bone marrow suppression", "Pancytopenia", "Life-threatening infections"],
+      "management": "Do not use together. If combination necessary, reduce azathioprine dose by 75%.",
+      "evidence_level": "A",
+      "references": ["Venkat Raman G, et al. Nephrol Dial Transplant. 2002;17(12):2089-2093"]
+    },
+    {
+      "id": "RULE_009",
+      "drug_a": "clopidogrel",
+      "drug_b": "omeprazole",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP2C19 inhibition reduces clopidogrel activation",
+      "clinical_effects": ["Reduced antiplatelet effect", "Increased cardiovascular events"],
+      "management": "Use alternative PPI (pantoprazole) or consider H2 blocker.",
+      "evidence_level": "B",
+      "references": ["Abraham NS, et al. Circulation. 2010;122(25):2619-2633"]
+    },
+    {
+      "id": "RULE_010",
+      "drug_a": "quinidine",
+      "drug_b": "digoxin",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "Quinidine displaces digoxin from tissues and reduces renal clearance",
+      "clinical_effects": ["Digoxin toxicity", "Cardiac arrhythmias", "Nausea", "Visual disturbances"],
+      "management": "Reduce digoxin dose by 50% and monitor levels closely.",
+      "evidence_level": "A",
+      "references": ["Hager WD, et al. N Engl J Med. 1979;300(22):1238-1241"]
+    },
+    {
+      "id": "RULE_011",
+      "drug_a": "amiodarone",
+      "drug_b": "simvastatin",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases statin levels and rhabdomyolysis risk",
+      "clinical_effects": ["Rhabdomyolysis", "Myopathy", "Elevated CK levels"],
+      "management": "Limit simvastatin dose to 20mg daily or use alternative statin.",
+      "evidence_level": "A",
+      "references": ["FDA Drug Safety Communication. June 2011"]
+    },
+    {
+      "id": "RULE_012",
+      "drug_a": "ciprofloxacin",
+      "drug_b": "theophylline",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP1A2 inhibition increases theophylline levels",
+      "clinical_effects": ["Theophylline toxicity", "Seizures", "Cardiac arrhythmias"],
+      "management": "Reduce theophylline dose by 50% and monitor levels closely.",
+      "evidence_level": "A",
+      "references": ["Wijnands WJ, et al. Clin Pharmacokinet. 1986;11(6):444-459"]
+    },
+    {
+      "id": "RULE_013",
+      "drug_a": "insulin",
+      "drug_b": "beta_blockers",
+      "severity": "moderate",
+      "category": "pharmacodynamic",
+      "mechanism": "Beta-blockers mask hypoglycemic symptoms and may impair glucose recovery",
+      "clinical_effects": ["Masked hypoglycemia", "Prolonged hypoglycemic episodes"],
+      "management": "Monitor blood glucose more frequently. Educate patient on non-adrenergic hypoglycemic symptoms.",
+      "evidence_level": "B",
+      "references": ["Hirsch IB, et al. Diabetes Care. 1991;14(7):583-591"]
+    },
+    {
+      "id": "RULE_014",
+      "drug_a": "potassium_supplements",
+      "drug_b": "spironolactone",
+      "severity": "major",
+      "category": "pharmacodynamic",
+      "mechanism": "Additive potassium-sparing effects increase hyperkalemia risk",
+      "clinical_effects": ["Hyperkalemia", "Cardiac arrhythmias", "Muscle weakness"],
+      "management": "Monitor serum potassium closely. Avoid routine potassium supplementation.",
+      "evidence_level": "A",
+      "references": ["Palmer BF. Clin J Am Soc Nephrol. 2010;5(11):2018-2025"]
+    },
+    {
+      "id": "RULE_015",
+      "drug_a": "ketoconazole",
+      "drug_b": "cyclosporine",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition significantly increases cyclosporine levels",
+      "clinical_effects": ["Cyclosporine toxicity", "Nephrotoxicity", "Hepatotoxicity"],
+      "management": "Reduce cyclosporine dose and monitor levels frequently.",
+      "evidence_level": "A",
+      "references": ["First MR, et al. Transplantation. 1993;55(5):1000-1004"]
+    },
+    {
+      "id": "RULE_016",
+      "drug_a": "heparin",
+      "drug_b": "nsaids",
+      "severity": "moderate",
+      "category": "pharmacodynamic",
+      "mechanism": "Additive anticoagulant effects and platelet inhibition",
+      "clinical_effects": ["Increased bleeding risk", "GI bleeding", "Bruising"],
+      "management": "Monitor for bleeding signs. Use gastroprotection if NSAID necessary.",
+      "evidence_level": "B",
+      "references": ["Shorr RI, et al. Arch Intern Med. 1993;153(17):1665-1670"]
+    },
+    {
+      "id": "RULE_017",
+      "drug_a": "phenobarbital",
+      "drug_b": "oral_contraceptives",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP enzyme induction reduces contraceptive hormone levels",
+      "clinical_effects": ["Contraceptive failure", "Breakthrough bleeding", "Unintended pregnancy"],
+      "management": "Use alternative contraceptive method or higher-dose formulation.",
+      "evidence_level": "A",
+      "references": ["Crawford P, et al. Epilepsia. 1986;27(4):425-433"]
+    },
+    {
+      "id": "RULE_018",
+      "drug_a": "lovastatin",
+      "drug_b": "gemfibrozil",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "Multiple mechanisms increase statin exposure and myopathy risk",
+      "clinical_effects": ["Severe myopathy", "Rhabdomyolysis", "Renal failure"],
+      "management": "Avoid combination. Use fenofibrate if fibrate needed with statin.",
+      "evidence_level": "A",
+      "references": ["Pierce LR, et al. JAMA. 1990;264(1):71-75"]
+    },
+    {
+      "id": "RULE_019",
+      "drug_a": "erythromycin",
+      "drug_b": "ergotamine",
+      "severity": "contraindicated",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases ergot alkaloid levels causing vasospasm",
+      "clinical_effects": ["Ergotism", "Severe vasospasm", "Gangrene", "Death"],
+      "management": "Do not use together. Use alternative antibiotic or antimigraine agent.",
+      "evidence_level": "A",
+      "references": ["Baldwin ZK, et al. Ann Pharmacother. 2003;37(1):46-51"]
+    },
+    {
+      "id": "RULE_020",
+      "drug_a": "fluoxetine",
+      "drug_b": "phenytoin",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP2C9 inhibition increases phenytoin levels",
+      "clinical_effects": ["Phenytoin toxicity", "Ataxia", "Nystagmus", "Confusion"],
+      "management": "Monitor phenytoin levels and adjust dose accordingly.",
+      "evidence_level": "B",
+      "references": ["Jalil P. Br J Clin Pharmacol. 1992;34(6):495-498"]
+    },
+    {
+      "id": "RULE_021",
+      "drug_a": "rifampin",
+      "drug_b": "prednisone",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 induction reduces corticosteroid levels",
+      "clinical_effects": ["Reduced steroid efficacy", "Adrenal insufficiency risk"],
+      "management": "Increase steroid dose during rifampin therapy. Monitor for loss of efficacy.",
+      "evidence_level": "B",
+      "references": ["McAllister WA, et al. Br Med J. 1983;287(6407):1751-1753"]
+    },
+    {
+      "id": "RULE_022",
+      "drug_a": "verapamil",
+      "drug_b": "carbamazepine",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases carbamazepine levels",
+      "clinical_effects": ["Carbamazepine toxicity", "Diplopia", "Ataxia", "Drowsiness"],
+      "management": "Monitor carbamazepine levels and reduce dose if necessary.",
+      "evidence_level": "B",
+      "references": ["Macphee GJ, et al. Lancet. 1986;1(8483):700-703"]
+    },
+    {
+      "id": "RULE_023",
+      "drug_a": "grapefruit_juice",
+      "drug_b": "atorvastatin",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "Intestinal CYP3A4 inhibition increases statin absorption",
+      "clinical_effects": ["Increased statin levels", "Myopathy risk", "Elevated liver enzymes"],
+      "management": "Avoid large amounts of grapefruit juice. Take statin at least 4 hours after grapefruit consumption.",
+      "evidence_level": "B",
+      "references": ["Lilja JJ, et al. Clin Pharmacol Ther. 1998;64(5):477-483"]
+    },
+    {
+      "id": "RULE_024",
+      "drug_a": "tacrolimus",
+      "drug_b": "fluconazole",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition significantly increases tacrolimus levels",
+      "clinical_effects": ["Tacrolimus toxicity", "Nephrotoxicity", "Neurotoxicity"],
+      "management": "Reduce tacrolimus dose significantly and monitor levels closely.",
+      "evidence_level": "A",
+      "references": ["Mori T, et al. Bone Marrow Transplant. 1999;23(10):1001-1005"]
+    },
+    {
+      "id": "RULE_025",
+      "drug_a": "St_Johns_wort",
+      "drug_b": "cyclosporine",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 induction reduces cyclosporine levels",
+      "clinical_effects": ["Transplant rejection", "Reduced immunosuppression"],
+      "management": "Avoid St. John's wort in transplant patients. Monitor cyclosporine levels if exposure occurs.",
+      "evidence_level": "A",
+      "references": ["Ruschitzka F, et al. Lancet. 2000;355(9203):548-549"]
+    },
+    {
+      "id": "RULE_026",
+      "drug_a": "dextromethorphan",
+      "drug_b": "mao_inhibitors",
+      "severity": "contraindicated",
+      "category": "pharmacodynamic",
+      "mechanism": "Risk of serotonin syndrome and hypertensive crisis",
+      "clinical_effects": ["Serotonin syndrome", "Hyperthermia", "Hypertensive crisis"],
+      "management": "Do not use together. Wait 14 days after MAO inhibitor discontinuation.",
+      "evidence_level": "A",
+      "references": ["Achamallah NS. Ann Pharmacother. 1992;26(11):1375-1377"]
+    },
+    {
+      "id": "RULE_027",
+      "drug_a": "sildenafil",
+      "drug_b": "nitrates",
+      "severity": "contraindicated",
+      "category": "pharmacodynamic",
+      "mechanism": "Additive vasodilation causes severe hypotension",
+      "clinical_effects": ["Severe hypotension", "Cardiovascular collapse", "Death"],
+      "management": "Never use together. Wait 24-48 hours between administrations.",
+      "evidence_level": "A",
+      "references": ["Cheitlin MD, et al. J Am Coll Cardiol. 1999;33(1):273-282"]
+    },
+    {
+      "id": "RULE_028",
+      "drug_a": "ACE_inhibitors",
+      "drug_b": "potassium_supplements",
+      "severity": "moderate",
+      "category": "pharmacodynamic",
+      "mechanism": "Reduced aldosterone increases potassium retention",
+      "clinical_effects": ["Hyperkalemia", "Cardiac conduction abnormalities"],
+      "management": "Monitor potassium levels regularly. Use potassium supplements cautiously.",
+      "evidence_level": "A",
+      "references": ["Reardon LC, et al. Arch Fam Med. 1993;2(10):1097-1103"]
+    },
+    {
+      "id": "RULE_029",
+      "drug_a": "calcium_channel_blockers",
+      "drug_b": "simvastatin",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases statin levels",
+      "clinical_effects": ["Myopathy", "Rhabdomyolysis", "Elevated CK"],
+      "management": "Limit simvastatin dose with diltiazem/verapamil. Monitor for muscle symptoms.",
+      "evidence_level": "B",
+      "references": ["Bellosta S, et al. Am J Cardiol. 2004;94(10):1259-1262"]
+    },
+    {
+      "id": "RULE_030",
+      "drug_a": "carbamazepine",
+      "drug_b": "doxycycline",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "Enzyme induction reduces doxycycline levels",
+      "clinical_effects": ["Antibiotic treatment failure", "Persistent infection"],
+      "management": "Use alternative antibiotic or increase doxycycline dose.",
+      "evidence_level": "B",
+      "references": ["Neuvonen PJ, et al. Br Med J. 1974;2(5919):535-536"]
+    },
+    {
+      "id": "RULE_031",
+      "drug_a": "methotrexate",
+      "drug_b": "probenecid",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "Reduced renal clearance increases methotrexate toxicity",
+      "clinical_effects": ["Methotrexate toxicity", "Bone marrow suppression", "Mucositis"],
+      "management": "Avoid combination. Monitor methotrexate levels if use necessary.",
+      "evidence_level": "A",
+      "references": ["Thyss A, et al. Cancer Chemother Pharmacol. 1986;16(3):283-287"]
+    },
+    {
+      "id": "RULE_032",
+      "drug_a": "valproic_acid",
+      "drug_b": "lamotrigine",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "Glucuronidation inhibition increases lamotrigine levels",
+      "clinical_effects": ["Lamotrigine toxicity", "Skin rash", "Stevens-Johnson syndrome"],
+      "management": "Reduce lamotrigine dose by 50% when adding valproic acid.",
+      "evidence_level": "A",
+      "references": ["Yuen AW, et al. Epilepsy Res. 1992;13(2):107-112"]
+    },
+    {
+      "id": "RULE_033",
+      "drug_a": "colchicine",
+      "drug_b": "clarithromycin",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "P-glycoprotein and CYP3A4 inhibition increases colchicine toxicity",
+      "clinical_effects": ["Colchicine toxicity", "Bone marrow suppression", "Multi-organ failure"],
+      "management": "Reduce colchicine dose significantly or use alternative antibiotic.",
+      "evidence_level": "A",
+      "references": ["Terkeltaub RA, et al. Arthritis Rheum. 2010;62(4):1060-1068"]
+    },
+    {
+      "id": "RULE_034",
+      "drug_a": "apixaban",
+      "drug_b": "ketoconazole",
+      "severity": "contraindicated",
+      "category": "pharmacokinetic",
+      "mechanism": "Dual P-gp and CYP3A4 inhibition dramatically increases apixaban levels",
+      "clinical_effects": ["Severe bleeding", "Hemorrhage", "Death"],
+      "management": "Do not use together. Use alternative antifungal if possible.",
+      "evidence_level": "A",
+      "references": ["Eliquis Prescribing Information. Bristol-Myers Squibb. 2021"]
+    },
+    {
+      "id": "RULE_035",
+      "drug_a": "rosuvastatin",
+      "drug_b": "gemfibrozil",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "OATP inhibition increases rosuvastatin exposure",
+      "clinical_effects": ["Myopathy", "Rhabdomyolysis", "Renal failure"],
+      "management": "Limit rosuvastatin dose to 10mg daily if combination necessary.",
+      "evidence_level": "A",
+      "references": ["Schneck DW, et al. Clin Pharmacol Ther. 2004;75(5):455-463"]
+    },
+    {
+      "id": "RULE_036",
+      "drug_a": "dabigatran",
+      "drug_b": "dronedarone",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "P-glycoprotein inhibition increases dabigatran levels",
+      "clinical_effects": ["Increased bleeding risk", "Major hemorrhage"],
+      "management": "Reduce dabigatran dose and monitor for bleeding signs.",
+      "evidence_level": "A",
+      "references": ["Pradaxa Prescribing Information. Boehringer Ingelheim. 2021"]
+    },
+    {
+      "id": "RULE_037",
+      "drug_a": "levetiracetam",
+      "drug_b": "oral_contraceptives",
+      "severity": "minor",
+      "category": "pharmacokinetic",
+      "mechanism": "No significant interaction - minimal enzyme induction",
+      "clinical_effects": ["No clinically significant effects"],
+      "management": "No dose adjustment necessary. Routine monitoring adequate.",
+      "evidence_level": "A",
+      "references": ["Ragueneau-Majlessi I, et al. Epilepsia. 2002;43(4):370-374"]
+    },
+    {
+      "id": "RULE_038",
+      "drug_a": "amlodipine",
+      "drug_b": "atorvastatin",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases atorvastatin levels",
+      "clinical_effects": ["Increased statin levels", "Myalgia", "Myopathy risk"],
+      "management": "Monitor for muscle symptoms. Consider lower statin dose.",
+      "evidence_level": "B",
+      "references": ["Jacobson TA. Am J Med. 2004;116(6):408-416"]
+    },
+    {
+      "id": "RULE_039",
+      "drug_a": "methylprednisolone",
+      "drug_b": "ketoconazole",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases corticosteroid levels",
+      "clinical_effects": ["Cushingoid effects", "HPA axis suppression", "Immunosuppression"],
+      "management": "Reduce steroid dose significantly. Monitor for steroid toxicity.",
+      "evidence_level": "A",
+      "references": ["Zurcher RM, et al. Clin Pharmacol Ther. 1989;45(6):626-629"]
+    },
+    {
+      "id": "RULE_040",
+      "drug_a": "gabapentin",
+      "drug_b": "aluminum_hydroxide",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "Antacid reduces gabapentin absorption",
+      "clinical_effects": ["Reduced gabapentin efficacy", "Poor seizure control"],
+      "management": "Separate administration by at least 2 hours.",
+      "evidence_level": "B",
+      "references": ["Steinberg WM, et al. Clin Pharmacol Ther. 1994;56(2):154-159"]
+    },
+    {
+      "id": "RULE_041",
+      "drug_a": "pravastatin",
+      "drug_b": "gemfibrozil",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "OATP inhibition increases pravastatin levels",
+      "clinical_effects": ["Myopathy", "Elevated CK", "Muscle pain"],
+      "management": "Monitor CK levels and muscle symptoms closely.",
+      "evidence_level": "B",
+      "references": ["Kyrklund C, et al. Eur J Clin Pharmacol. 2003;59(4):321-327"]
+    },
+    {
+      "id": "RULE_042",
+      "drug_a": "rivaroxaban",
+      "drug_b": "rifampin",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 and P-gp induction reduces rivaroxaban levels",
+      "clinical_effects": ["Reduced anticoagulation", "Thrombotic events"],
+      "management": "Avoid combination. Use alternative anticoagulant if rifampin necessary.",
+      "evidence_level": "A",
+      "references": ["Xarelto Prescribing Information. Janssen. 2021"]
+    },
+    {
+      "id": "RULE_043",
+      "drug_a": "fentanyl",
+      "drug_b": "ritonavir",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "CYP3A4 inhibition increases fentanyl levels and respiratory depression risk",
+      "clinical_effects": ["Respiratory depression", "Sedation", "Death"],
+      "management": "Reduce fentanyl dose significantly. Monitor respiratory status closely.",
+      "evidence_level": "A",
+      "references": ["Olkkola KT, et al. Anesthesiology. 1999;91(3):681-685"]
+    },
+    {
+      "id": "RULE_044",
+      "drug_a": "esomeprazole",
+      "drug_b": "atazanavir",
+      "severity": "major",
+      "category": "pharmacokinetic",
+      "mechanism": "Acid suppression reduces atazanavir absorption",
+      "clinical_effects": ["Reduced antiviral efficacy", "Treatment failure", "Resistance development"],
+      "management": "Avoid combination. If PPI necessary, use with ritonavir boosting.",
+      "evidence_level": "A",
+      "references": ["Reyataz Prescribing Information. Bristol-Myers Squibb. 2021"]
+    },
+    {
+      "id": "RULE_045",
+      "drug_a": "methyldopa",
+      "drug_b": "iron_supplements",
+      "severity": "moderate",
+      "category": "pharmacokinetic",
+      "mechanism": "Iron chelation reduces methyldopa absorption",
+      "clinical_effects": ["Reduced antihypertensive effect", "Poor blood pressure control"],
+      "management": "Separate administration by at least 2 hours. Monitor blood pressure.",
+      "evidence_level": "B",
+      "references": ["Campbell NR, et al. Clin Pharmacol Ther. 1990;48(4):381-389"]
+    }
+  ],
+  "drug_class_interactions": {
+    "anticoagulants": {
+      "interacting_classes": ["antiplatelets", "nsaids", "corticosteroids", "antibiotics"],
+      "general_mechanism": "Additive bleeding risk or altered coagulation",
+      "monitoring": "INR, bleeding signs, platelet count"
+    },
+    "statins": {
+      "interacting_classes": ["cyp3a4_inhibitors", "fibrates", "azole_antifungals"],
+      "general_mechanism": "Increased statin levels leading to myopathy risk",
+      "monitoring": "CK levels, muscle symptoms, liver enzymes"
+    },
+    "ace_inhibitors": {
+      "interacting_classes": ["potassium_supplements", "potassium_sparing_diuretics", "nsaids"],
+      "general_mechanism": "Hyperkalemia risk or reduced antihypertensive effect",
+      "monitoring": "Serum potassium, renal function, blood pressure"
+    },
+    "antiepileptics": {
+      "interacting_classes": ["enzyme_inducers", "enzyme_inhibitors", "oral_contraceptives"],
+      "general_mechanism": "Altered drug levels affecting seizure control or contraceptive efficacy",
+      "monitoring": "Drug levels, seizure frequency, contraceptive efficacy"
+    }
+  },
+  "special_populations": {
+    "elderly": {
+      "considerations": [
+        "Increased sensitivity to drug interactions",
+        "Polypharmacy increases interaction risk",
+        "Reduced hepatic and renal function",
+        "Monitor more frequently"
+      ]
+    },
+    "pediatric": {
+      "considerations": [
+        "Age-related differences in drug metabolism",
+        "Weight-based dosing considerations",
+        "Limited interaction data available",
+        "Consider developmental pharmacology"
+      ]
+    },
+    "pregnancy": {
+      "considerations": [
+        "Physiological changes affect drug interactions",
+        "Teratogenic risk assessment needed",
+        "Benefit-risk evaluation required",
+        "Consult pregnancy-specific resources"
+      ]
+    },
+    "renal_impairment": {
+      "considerations": [
+        "Altered drug clearance",
+        "Accumulation of active metabolites",
+        "Dose adjustments may be needed",
+        "Monitor renal function closely"
+      ]
+    },
+    "hepatic_impairment": {
+      "considerations": [
+        "Reduced hepatic metabolism",
+        "Altered protein binding",
+        "Increased interaction potential",
+        "Consider Child-Pugh classification"
+      ]
+    }
+  },
+  "monitoring_guidelines": {
+    "clinical_monitoring": {
+      "frequency": "Based on interaction severity and patient risk factors",
+      "parameters": ["Efficacy endpoints", "Adverse effects", "Vital signs", "Laboratory values"],
+      "documentation": "Record all monitoring activities and outcomes"
+    },
+    "laboratory_monitoring": {
+      "routine_tests": ["Complete blood count", "Basic metabolic panel", "Liver function tests"],
+      "specific_tests": ["Drug levels", "Coagulation studies", "Cardiac enzymes"],
+      "timing": "Baseline, steady-state, and periodic monitoring"
+    }
+  },
+  "clinical_decision_support": {
+    "alert_thresholds": {
+      "contraindicated": "Block prescription and require override",
+      "major": "Hard stop alert with clinical justification required",
+      "moderate": "Soft alert with acknowledgment required",
+      "minor": "Informational alert only"
+    },
+    "override_requirements": {
+      "contraindicated": "Senior physician approval and documentation",
+      "major": "Clinical justification and monitoring plan",
+      "moderate": "Acknowledgment of interaction",
+      "minor": "No override required"
+    }
+  },
+  "update_policy": {
+    "review_cycle": "Quarterly review of all interaction rules",
+    "evidence_updates": "Incorporate new evidence within 30 days",
+    "version_control": "Maintain version history and change log",
+    "validation": "Clinical pharmacist review required for all changes"
+  }
+}
