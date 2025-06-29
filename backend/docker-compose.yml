@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://drugapp:securepass@db:5432/drugdb
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DEBUG=true
+      - FDA_API_KEY=${FDA_API_KEY:-}
+      - GOOGLE_CLOUD_CREDENTIALS=${GOOGLE_CLOUD_CREDENTIALS:-}
+      - AZURE_COGNITIVE_KEY=${AZURE_COGNITIVE_KEY:-}
+      - AZURE_COGNITIVE_ENDPOINT=${AZURE_COGNITIVE_ENDPOINT:-}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./app:/app/app
+      - prescription_images:/app/uploads
+      - ./tests:/app/tests
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=drugapp
+      - POSTGRES_PASSWORD=securepass
+      - POSTGRES_DB=drugdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U drugapp -d drugdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - prescription_images:/var/www/uploads:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+    
+  # Development tools
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@druginteraction.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    profiles:
+      - dev
+    
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    profiles:
+      - dev
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prescription_images:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  default:
+    name: drug-interaction-network
+    driver: bridge
