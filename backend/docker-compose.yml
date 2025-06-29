@@ -22,7 +22,7 @@ services:
       - prescription_images:/app/uploads
       - ./tests:/app/tests
     restart: unless-stopped
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
     
   db:
     image: postgres:15-alpine
@@ -102,7 +102,7 @@ volumes:
     driver: local
   prescription_images:
     driver: local
-  pgadmin_data:
+  pgladmin_data:
     driver: local
 
 networks:
